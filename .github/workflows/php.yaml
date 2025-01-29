@@ -1,0 +1,57 @@
+name: php-workflow
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker Image
+        run: docker build -t melvinsamuel070/php:0.0.1 .
+
+      - name: Push Docker Image
+        run: docker push melvinsamuel070/php:0.0.1
+
+      - name: Deploy Image to EC2 Instance
+        env:
+          KEY_FILE: ${{ secrets.EC2_KEY }}
+          EC2_USER: ubuntu
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          echo "${KEY_FILE}" > private-key.pem
+          chmod 600 private-key.pem
+          ssh -o StrictHostKeyChecking=no -i private-key.pem ${EC2_USER}@${EC2_HOST} \
+          "docker pull melvinsamuel070/php:0.0.1 && docker run -d -p 80:80 melvinsamuel070/php:0.0.1"
+          rm -f private-key.pem
+
+      - name: Install Docker on EC2
+        uses: melvinsamuel070/install-docker-actions@v1
+      - name: making docker a sudoer
+        run: sudo usermod -aG docker $USER
+
+      - name: clone the repository
+        run: git clone https://github.com/melvinsamuel070/php.git
+
+      
+      
+
+          
+
+          
+              

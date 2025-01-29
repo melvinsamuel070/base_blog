@@ -1,0 +1,35 @@
+services:
+  base:
+    image: melvinsamuel070/php:0.0.1
+    restart: always
+    # deploy:
+    #   replicas: 3
+    ports:
+      - "8090:80"
+    networks:
+      - mynetwork
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    networks:
+      - mynetwork
+    environment:
+      MYSQL_ROOT_USERNAME: root
+      MYSQL_ROOT_PASSWORD: samuelson070
+      MYSQL_DATABASE: newblog
+
+  phpmyadmin:
+    depends_on:
+      - mysql
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "800:80"
+    networks:
+      - mynetwork
+    environment:
+      PMA_ARBITRARY: 1
+
+networks:
+  mynetwork:
+    driver: bridge
