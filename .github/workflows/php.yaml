@@ -16,6 +16,9 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
 
+      - name: PHP testing actions
+        uses: 104corp/docker-php-testing@master
+        
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -37,8 +40,7 @@ jobs:
           echo "${KEY_FILE}" > private-key.pem
           chmod 600 private-key.pem
           ssh -o StrictHostKeyChecking=no -i private-key.pem ${EC2_USER}@${EC2_HOST} \
-          "docker pull melvinsamuel070/php:0.0.1 && docker run -d -p 80:80 melvinsamuel070/php:0.0.1"
-          rm -f private-key.pem
+          private-key.pem
 
       - name: Install Docker on EC2
         uses: melvinsamuel070/install-docker-actions@v1
@@ -46,7 +48,26 @@ jobs:
         run: sudo usermod -aG docker $USER
 
       - name: clone the repository
-        run: git clone https://github.com/melvinsamuel070/php.git
+        run: |
+           git clone github.com/melvinsamuel070/base_blog.git
+           cd bse_blog
+           docker compose up -d
+           docker compose ps
+           docker compose logs
+           docker compose down
+
+      - name: Send Email Notification for Deployment Success
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "Deployment Success: CD Pipeline"
+          body: "The deployment of your application completed successfully."
+          to: kingsamuel412@gmail.com
+          from: ${{ secrets.EMAIL_USERNAME }}     
+
 
       
       
