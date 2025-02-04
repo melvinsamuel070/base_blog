@@ -8,25 +8,29 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      DOCKER_TAG: ${{ github.sha }}  # Use commit SHA as the tag
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: "Use variable"       
+      - name: Build Docker Image
         run: |
-          echo $DOCKER_TAG
-          docker build -t melvinsamuel070/php:0.0.1:$DOCKER_TAG .
+          echo "Building Docker image with tag: $DOCKER_TAG"
+          docker build -t melvinsamuel070/php:0.0.1-$DOCKER_TAG .
 
-      - name: "Login to DockerHub"
+      - name: Login to DockerHub
         run: |
+          echo "Logging in to DockerHub"
           docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: "Push to Docker Hub"
+      - name: Push to Docker Hub
         run: |
-          docker push melvinsamuel070/php:0.0.1:$DOCKER_TAG
-      
-      - name: PHP testing actions
+          echo "Pushing Docker image to DockerHub"
+          docker push melvinsamuel070/php:0.0.1-$DOCKER_TAG || exit 1
+
+      - name: PHP Testing
         uses: 104corp/docker-php-testing@master
 
       - name: Deploy Image to EC2 Instance
@@ -37,22 +41,21 @@ jobs:
         run: |
           echo "${KEY_FILE}" > private-key.pem
           chmod 600 private-key.pem
-          ssh -o StrictHostKeyChecking=no -i private-key.pem ${EC2_USER}@${EC2_HOST} \
-          private-key.pem
+          ssh -o StrictHostKeyChecking=no -i private-key.pem ${EC2_USER}@${EC2_HOST} << 'EOF'
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+          sudo systemctl start docker
+          sudo systemctl enable docker
+          EOF
 
-      - name: Install Docker on EC2
-        uses: melvinsamuel070/install-docker-actions@v1
-      - name: making docker a sudoer
-        run: sudo usermod -aG docker $USER
-
-      - name: clone the repository
+      - name: Clone Repository and Start Docker Compose
         run: |
-           git clone github.com/melvinsamuel070/base_blog.git
-           cd bse_blog
-           docker compose up -d
-           docker compose ps
-           docker compose logs
-           docker compose down
+          git clone https://github.com/melvinsamuel070/base_blog.git
+          cd base_blog
+          docker-compose up -d
+          docker-compose ps
+          docker-compose logs
+          EOF
 
       - name: Send Email Notification for Deployment Success
         uses: dawidd6/action-send-mail@v3
@@ -62,15 +65,9 @@ jobs:
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "Deployment Success: CD Pipeline"
-          body: "The deployment of your application completed successfully."
+          body: |
+            The deployment of your application completed successfully.
+            Branch: ${{ github.ref }}
+            Commit SHA: ${{ github.sha }}
           to: kingsamuel412@gmail.com
-          from: ${{ secrets.EMAIL_USERNAME }}     
-
-
-      
-      
-
-          
-
-          
-              
+          from: ${{ secrets.EMAIL_USERNAME }}
