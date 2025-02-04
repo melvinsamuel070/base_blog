@@ -21,7 +21,7 @@ jobs:
         run: docker build -t melvinsamuel070/php:0.0.1 .
   
       - name: Docker Hub Login
-        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | -u "${{ secrets.DOCKERHUB_USERNAME }}" 
+        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" 
       
       - name: Push to Docker Hub
         run: docker push melvinsamuel070/php:0.0.1
