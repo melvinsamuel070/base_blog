@@ -22,7 +22,7 @@ jobs:
   
       - name: Docker Hub Login
         run: |
-           echo"${{ secrets.DOCKERHUB_PASSWORD }}"| docker login -u "${{ secrets.DOCKERHUB_USERNAME }}"
+           echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}"
       
       - name: Push to Docker Hub
         run: docker push melvinsamuel070/php:0.0.1
