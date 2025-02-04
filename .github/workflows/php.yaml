@@ -26,7 +26,7 @@ jobs:
       - name: Login to DockerHub
         run: |
           echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-          
+
       - name: Push to Docker Hub
         run: docker push melvinsamuel070/php:0.0.1
   
@@ -45,7 +45,7 @@ jobs:
             
       - name: Clone Repository and Start Docker Compose
         run: |
-          git clone https://github.com/melvinsamuel070/base_blog.git
+          git clone https://github.com/melvinsamuel070/base_blog.git base_blog
           cd base_blog
           docker-compose up -d
           docker-compose ps
