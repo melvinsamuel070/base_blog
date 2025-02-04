@@ -66,9 +66,9 @@ jobs:
         run: |
           git clone https://github.com/melvinsamuel070/base_blog.git base_blog
           cd base_blog
-          docker-compose up -d
-          docker-compose ps
-          docker-compose logs
+          docker compose up -d
+          docker compose ps
+          docker compose logs
 
       - name: Send Email Notification for Deployment Success
         uses: dawidd6/action-send-mail@v3
