@@ -23,10 +23,10 @@ jobs:
       - name: Docker Hub Push
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}"
       
-      - name: Docker Hub Login
+      - name: Login to DockerHub
         run: |
-           echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}"
-      
+          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          
       - name: Push to Docker Hub
         run: docker push melvinsamuel070/php:0.0.1
   
@@ -50,7 +50,6 @@ jobs:
           docker-compose up -d
           docker-compose ps
           docker-compose logs
-          EOF
 
       - name: Send Email Notification for Deployment Success
         uses: dawidd6/action-send-mail@v3
