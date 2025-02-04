@@ -61,8 +61,5 @@ jobs:
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: "Deployment Success: CD Pipeline"
           body: |
-            The deployment of your application completed successfully.
-            Branch: ${{ github.ref }}
-            Commit SHA: ${{ github.sha }}
           to: kingsamuel412@gmail.com
           from: ${{ secrets.EMAIL_USERNAME }}
