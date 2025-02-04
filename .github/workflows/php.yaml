@@ -8,8 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      DOCKER_TAG: ${{ github.sha }}  # Use commit SHA as the tag
+    # env:
+    #   DOCKER_TAG: ${{ github.sha }}  # Use commit SHA as the tag
 
     steps:
       - name: Checkout
@@ -17,8 +17,8 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          echo "Building Docker image with tag: $DOCKER_TAG"
-          docker build -t melvinsamuel070/php:0.0.1-$DOCKER_TAG .
+          # echo "Building Docker image with tag:
+          docker build -t melvinsamuel070/php:0.0.1 .
 
       - name: Login to DockerHub
         run: |
