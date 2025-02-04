@@ -14,11 +14,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build Docker Image
-        run: |
-          # echo "Building Docker image with tag:
-          docker build -t melvinsamuel070/php:0.0.1 .
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
   
@@ -27,9 +22,8 @@ jobs:
   
       - name: Login to Docker Hub
         run: |
-            echo "Logging in to DockerHub"
-            echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "melvinsamuel070" --password-stdin
-  
+          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
       - name: Push to Docker Hub
         run: docker push melvinsamuel070/php:0.0.1
   
